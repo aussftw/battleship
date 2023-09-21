@@ -41,3 +41,17 @@ export function placeShip(
 
   return newBoard;
 }
+
+export function initializeBoard(): Board {
+  const board: Board = Array(10).fill(Array(10).fill('EMPTY'));
+
+  return board;
+}
+
+export const shipsData = {
+  Destroyer: { size: 1 },
+  Submarine: { size: 2 },
+  Cruiser: { size: 3 },
+  Battleship: { size: 4 },
+  Carrier: { size: 5 },
+};

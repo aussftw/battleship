@@ -1,4 +1,3 @@
-import { initializeBoard } from './board';
-import { placeShip } from './gameHelpers';
+import { placeShip, initializeBoard, shipsData } from './gameHelpers';
 
-export { initializeBoard, placeShip };
+export { initializeBoard, placeShip, shipsData };

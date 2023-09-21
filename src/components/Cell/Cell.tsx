@@ -3,11 +3,11 @@ import { CellStatus } from '../../types';
 
 interface CellProps {
   status: CellStatus;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
-  onContextMenu: (e: React.MouseEvent) => void;
-  onMouseOver: () => void;
-  onMouseOut: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  onMouseOver?: () => void;
+  onMouseOut?: () => void;
   isHovered?: boolean;
   isInvalidHover?: boolean;
 }
