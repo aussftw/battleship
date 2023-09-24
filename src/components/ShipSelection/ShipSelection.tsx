@@ -1,5 +1,5 @@
 import Cell from '../Cell/Cell';
-
+import { CellStatus } from '../../types';
 export interface Ship {
   name: string;
   size: number;
@@ -33,7 +33,11 @@ const ShipSelection: React.FC<ShipSelectionProps> = ({
             >
               <div className="flex space-x-1">
                 {[...Array(ship.size)].map((_, idx) => (
-                  <Cell key={idx} status="SHIP" className="w-6 h-6" />
+                  <Cell
+                    key={idx}
+                    status={CellStatus.SHIP}
+                    className="w-6 h-6"
+                  />
                 ))}
               </div>
               <span className="ml-2">

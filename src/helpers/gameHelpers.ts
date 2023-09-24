@@ -1,15 +1,15 @@
-import { Board, Ship } from '../types';
+import { Board, Ship, CellStatus } from '../types';
 
 function canPlaceShip(board: Board, x: number, y: number, ship: Ship): boolean {
   if (ship.direction === 'HORIZONTAL') {
     for (let i = 0; i < ship.length; i++) {
-      if (y + i >= board[x].length || board[x][y + i] !== 'EMPTY') {
+      if (y + i >= board[x].length || board[x][y + i] !== CellStatus.EMPTY) {
         return false;
       }
     }
   } else {
     for (let i = 0; i < ship.length; i++) {
-      if (x + i >= board.length || board[x + i][y] !== 'EMPTY') {
+      if (x + i >= board.length || board[x + i][y] !== CellStatus.EMPTY) {
         return false;
       }
     }
@@ -31,11 +31,11 @@ export function placeShip(
 
   if (ship.direction === 'HORIZONTAL') {
     for (let i = 0; i < ship.length; i++) {
-      newBoard[x][y + i] = 'SHIP';
+      newBoard[x][y + i] = CellStatus.SHIP;
     }
   } else {
     for (let i = 0; i < ship.length; i++) {
-      newBoard[x + i][y] = 'SHIP';
+      newBoard[x + i][y] = CellStatus.SHIP;
     }
   }
 
@@ -43,7 +43,7 @@ export function placeShip(
 }
 
 export function initializeBoard(): Board {
-  const board: Board = Array(10).fill(Array(10).fill('EMPTY'));
+  const board: Board = Array(10).fill(Array(10).fill(CellStatus.EMPTY));
 
   return board;
 }

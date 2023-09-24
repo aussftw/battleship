@@ -1,25 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
+
 import { Cell } from '../';
 import {
   initializeBoard,
   placeShip as placeShipHelper,
   shipsData,
 } from '../../helpers';
-
 import { Board as BoardType, Ship as ShipType } from '../../types';
-import { RootState } from '../../store/store';
 import { placeShip } from '../../features/selectShipReudcer';
+import { setPlayerBoard, Player, GameStatus } from '../../features/gameReducer';
 
-const Board: React.FC = () => {
+type BoardProps = {
+  player1Board: BoardType;
+  player2Board: BoardType;
+  activePlayer: Player;
+  gameStatus: GameStatus;
+  selectedShipName: string | null;
+  player1AllShipsPlaced: boolean;
+};
+
+const Board: React.FC<BoardProps> = ({
+  player1Board,
+  player2Board,
+  gameStatus,
+  activePlayer,
+  selectedShipName,
+  player1AllShipsPlaced,
+}) => {
   const dispatch = useDispatch();
   const [hoveredCells, setHoveredCells] = useState<Set<string>>(new Set());
   const [board, setBoard] = useState<BoardType>(initializeBoard());
+  const [isPlayer2BoardInitialized, setIsPlayer2BoardInitialized] =
+    useState<boolean>(false);
+
   const [invalidHoveredCells, setInvalidHoveredCells] = useState<Set<string>>(
     new Set(),
-  );
-  const selectedShipName = useSelector(
-    (state: RootState) => state.selectShip.selectedShip,
   );
 
   const [currentShip, setCurrentShip] = useState<ShipType | null>({
@@ -29,17 +45,21 @@ const Board: React.FC = () => {
     direction: 'HORIZONTAL',
   });
 
-  const handleCellClick = (x: number, y: number) => {
-    if (currentShip && selectedShipName) {
-      // Ensure we have a current ship and its name is available
-      const newBoard = placeShipHelper(board, x, y, currentShip);
-      if (newBoard !== board) {
-        // I'm assuming the `placeShipHelper` will return a new board state only if the ship was successfully placed. Adjust this check accordingly.
-        setBoard(newBoard);
-        handlePlaceShip(selectedShipName); // Update the ship's `isPlaced` status in the Redux store
-      }
+  useEffect(() => {
+    if (
+      player1AllShipsPlaced &&
+      activePlayer === Player.Player2 &&
+      !isPlayer2BoardInitialized
+    ) {
+      // When all ships of player 1 are placed and the active player is Player 2,
+      // set the board to an empty board for Player 2 to start placing their ships
+      setBoard(initializeBoard());
+      setIsPlayer2BoardInitialized(true);
     }
-  };
+    if (gameStatus !== GameStatus.SettingUp) {
+      setBoard(activePlayer === Player.Player1 ? player1Board : player2Board);
+    }
+  }, [activePlayer, player1Board, player2Board]);
 
   useEffect(() => {
     if (selectedShipName) {
@@ -128,6 +148,18 @@ const Board: React.FC = () => {
 
   const handlePlaceShip = () => {
     dispatch(placeShip(selectedShipName!));
+  };
+
+  const handleCellClick = (x: number, y: number) => {
+    if (currentShip && selectedShipName) {
+      const newBoard = placeShipHelper(board, x, y, currentShip);
+      if (newBoard !== board) {
+        console.log('Board Updated');
+        setBoard(newBoard);
+        handlePlaceShip(); // Update the ship's `isPlaced` status in the Redux store
+        dispatch(setPlayerBoard(newBoard));
+      }
+    }
   };
 
   return (

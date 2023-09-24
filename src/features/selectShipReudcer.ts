@@ -1,15 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface Ship {
+export type Ship = {
   name: string;
   size: number;
   isPlaced: boolean;
-}
+};
 
-interface selectShipState {
+type selectShipState = {
   ships: Ship[];
   selectedShip: string | null;
-}
+};
 
 export const selectShipInitialState: selectShipState = {
   ships: [
@@ -23,8 +23,8 @@ export const selectShipInitialState: selectShipState = {
 };
 
 const selectShipSlice = createSlice({
-  name: 'game',
-  initialState: selectShipInitialState, // Updated this line
+  name: 'selectShip',
+  initialState: selectShipInitialState,
   reducers: {
     selectShip: (state, action: PayloadAction<string>) => {
       state.selectedShip = action.payload;
@@ -36,9 +36,14 @@ const selectShipSlice = createSlice({
       }
       state.selectedShip = null; // Deselect the ship after placing
     },
+    resetShips: (state) => {
+      state.ships.forEach((ship) => {
+        ship.isPlaced = false;
+      });
+    },
   },
 });
 
-export const { selectShip, placeShip } = selectShipSlice.actions;
+export const { selectShip, placeShip, resetShips } = selectShipSlice.actions;
 
 export default selectShipSlice.reducer;
