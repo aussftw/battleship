@@ -1,15 +1,11 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 
-import { Board, ShipSelection } from '../../components';
+import { Board, ShipSelection, GameModal } from '../../components';
 import { selectShip, resetShips } from '../../features/selectShipReudcer';
 import { Ship } from '../../features/selectShipReudcer';
-
-import {
-  GameStatus,
-  Player,
-  setActivePlayer,
-} from '../../features/gameReducer';
+import { GameStatus, Player } from '../../types';
+import { setActivePlayer, setGameStatus } from '../../features/gameReducer';
 
 import {
   selectedShipNameSelector,
@@ -18,6 +14,7 @@ import {
   gameStatusSelector,
   activePlayerSelector,
   player1AllShipsPlacedSelector,
+  player2AllShipsPlacedSelector,
   shipsSelector,
 } from '../../selectros';
 
@@ -31,25 +28,59 @@ export const Game = () => {
   const gameStatus = useSelector(gameStatusSelector);
   const activePlayer = useSelector(activePlayerSelector);
   const player1AllShipsPlaced = useSelector(player1AllShipsPlacedSelector);
-  const [isOpenModal, setIsOpenModal] = useState(false);
+  const player2AllShipsPlaced = useSelector(player2AllShipsPlacedSelector);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [isShooted, setIsShooted] = useState<boolean>(false);
+
+  console.log(isShooted, '<<<');
 
   const handleSelectShip = (ship: Ship) => {
     dispatch(selectShip(ship.name));
   };
 
-  const handleResetClick = () => {
+  const handleResetClick = useCallback(() => {
     setIsOpenModal(false);
     dispatch(resetShips());
-  };
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setIsOpenModal(false);
+  }, []);
+
+  const handleResetGame = useCallback(() => {
+    //TODO: reset game
+  }, []);
+
+  const handlePassTurn = useCallback(() => {
+    setIsOpenModal(true);
+    setIsShooted(false);
+    dispatch(
+      setActivePlayer(
+        activePlayer === Player.Player1 ? Player.Player2 : Player.Player1,
+      ),
+    );
+  }, [dispatch, activePlayer]);
 
   useEffect(() => {
     if (player1AllShipsPlaced) {
       dispatch(setActivePlayer(Player.Player2));
       setIsOpenModal(true);
     }
+    if (player2AllShipsPlaced) {
+      dispatch(setActivePlayer(Player.Player1));
+    }
   }, [player1AllShipsPlaced]);
 
-  const shipSelectionComponent = useMemo(() => {
+  useEffect(() => {
+    if (player2AllShipsPlaced && gameStatus === GameStatus.SettingUp) {
+      dispatch(setGameStatus(GameStatus.InPlay));
+      dispatch(setActivePlayer(Player.Player1));
+      console.log(gameStatus);
+    }
+    console.log(gameStatus);
+  }, [gameStatus, player2AllShipsPlaced]);
+
+  const renderShipSelection = () => {
     if (gameStatus === GameStatus.SettingUp) {
       return (
         <ShipSelection
@@ -59,25 +90,19 @@ export const Game = () => {
         />
       );
     }
-    return null;
-  }, [gameStatus, ships, selectedShipName, handleSelectShip]);
+  };
 
   const renderModal = useMemo(() => {
     if (isOpenModal) {
       return (
-        isOpenModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded shadow-lg">
-              <p className="mb-4">Now it's Player 2's turn.</p>
-              <button
-                onClick={handleResetClick}
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-              >
-                Start
-              </button>
-            </div>
-          </div>
-        )
+        <GameModal
+          isOpenModal={isOpenModal}
+          gameStatus={gameStatus}
+          activePlayer={activePlayer}
+          handleResetClick={handleResetClick}
+          handleModalClose={handleModalClose}
+          handleResetGame={handleResetGame}
+        />
       );
     }
     return null;
@@ -85,16 +110,53 @@ export const Game = () => {
 
   return (
     <>
-      {shipSelectionComponent}
+      {renderShipSelection()}
       {renderModal}
-      <Board
-        selectedShipName={selectedShipName}
-        player1Board={player1Board}
-        player2Board={player2Board}
-        gameStatus={gameStatus}
-        activePlayer={activePlayer}
-        player1AllShipsPlaced={player1AllShipsPlaced}
-      />
+
+      <div>
+        {gameStatus === GameStatus.SettingUp && (
+          <div className="flex justify-center items-center h-screen">
+            <Board
+              selectedShipName={selectedShipName}
+              player1Board={player1Board}
+              player2Board={player2Board}
+              gameStatus={gameStatus}
+              activePlayer={activePlayer}
+              player1AllShipsPlaced={player1AllShipsPlaced}
+            />
+          </div>
+        )}
+        {gameStatus === GameStatus.InPlay && (
+          <>
+            <div className="flex justify-center items-center h-screen flex-col md:flex-row space-y-12 md:space-y-0 md:space-x-24">
+              <Board
+                player1Board={player1Board}
+                player2Board={player2Board}
+                gameStatus={gameStatus}
+                activePlayer={activePlayer}
+              />
+              <Board
+                player1Board={player1Board}
+                player2Board={player2Board}
+                gameStatus={gameStatus}
+                activePlayer={activePlayer}
+                isShootingBoard={true}
+                setIsShooted={setIsShooted}
+                isShooted={isShooted}
+              />
+            </div>
+            <div className="flex items-center justify-center ">
+              <button
+                onClick={handlePassTurn}
+                className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition duration-200"
+                disabled={!isShooted}
+              >
+                Finish turn
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 };

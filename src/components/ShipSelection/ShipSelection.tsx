@@ -1,14 +1,16 @@
 import Cell from '../Cell/Cell';
 import { CellStatus } from '../../types';
+
+import { ShipName } from '../../types';
 export interface Ship {
-  name: string;
+  name: ShipName | null;
   size: number;
   isPlaced: boolean;
 }
 
 interface ShipSelectionProps {
   ships: Ship[];
-  selectedShipName: string | null;
+  selectedShipName: ShipName | null;
   onSelectShip: (ship: Ship) => void;
 }
 

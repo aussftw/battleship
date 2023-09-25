@@ -1,23 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ShipName } from '../types';
 
 export type Ship = {
-  name: string;
+  name: ShipName | null;
   size: number;
   isPlaced: boolean;
 };
 
 type selectShipState = {
   ships: Ship[];
-  selectedShip: string | null;
+  selectedShip: ShipName | null;
 };
 
 export const selectShipInitialState: selectShipState = {
   ships: [
-    { name: 'Destroyer', size: 1, isPlaced: false },
-    { name: 'Submarine', size: 2, isPlaced: false },
-    { name: 'Cruiser', size: 3, isPlaced: false },
-    { name: 'Battleship', size: 4, isPlaced: false },
-    { name: 'Carrier', size: 5, isPlaced: false },
+    { name: ShipName.Destroyer, size: 1, isPlaced: false },
+    { name: ShipName.Submarine, size: 2, isPlaced: false },
+    { name: ShipName.Cruiser, size: 3, isPlaced: false },
+    { name: ShipName.Battleship, size: 4, isPlaced: false },
+    { name: ShipName.Carrier, size: 5, isPlaced: false },
   ],
   selectedShip: null,
 };
@@ -26,7 +27,7 @@ const selectShipSlice = createSlice({
   name: 'selectShip',
   initialState: selectShipInitialState,
   reducers: {
-    selectShip: (state, action: PayloadAction<string>) => {
+    selectShip: (state, action: PayloadAction<ShipName | null>) => {
       state.selectedShip = action.payload;
     },
     placeShip: (state, action: PayloadAction<string>) => {

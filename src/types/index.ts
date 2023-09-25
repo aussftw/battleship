@@ -19,3 +19,14 @@ export type Ship = {
   length: number;
   direction: 'HORIZONTAL' | 'VERTICAL';
 };
+
+export enum GameStatus {
+  SettingUp = 'SettingUp',
+  InPlay = 'InPlay',
+  Ended = 'Ended',
+}
+
+export enum Player {
+  Player1 = 'Player1',
+  Player2 = 'Player2',
+}

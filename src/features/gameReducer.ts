@@ -1,23 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Board, CellStatus } from '../types';
 
-export enum GameStatus {
-  SettingUp = 'SettingUp',
-  InPlay = 'InPlay',
-  Ended = 'Ended',
-}
+import { GameStatus, Player } from '../types';
 
-export enum Player {
-  Player1 = 'Player1',
-  Player2 = 'Player2',
-}
-
-interface GameState {
+type GameState = {
   activePlayer: Player;
   gameStatus: GameStatus;
   player1Board: Board;
   player2Board: Board;
-}
+};
 
 const initialState: GameState = {
   activePlayer: Player.Player1,
@@ -56,13 +47,18 @@ const gameSlice = createSlice({
       } else if (targetBoard[x][y] === CellStatus.EMPTY) {
         targetBoard[x][y] = CellStatus.MISS;
       }
-
-      state.activePlayer =
-        state.activePlayer === Player.Player1 ? Player.Player2 : Player.Player1;
+    },
+    resetGame: (state) => {
+      return initialState;
     },
   },
 });
 
-export const { setActivePlayer, setGameStatus, setPlayerBoard } =
-  gameSlice.actions;
+export const {
+  setActivePlayer,
+  setGameStatus,
+  setPlayerBoard,
+  playerShoot,
+  resetGame,
+} = gameSlice.actions;
 export default gameSlice.reducer;

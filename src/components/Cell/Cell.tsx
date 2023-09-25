@@ -25,21 +25,20 @@ const Cell: React.FC<CellProps> = ({
   let cellStyle = '';
 
   switch (status) {
-    case 'EMPTY':
+    case CellStatus.EMPTY:
       cellStyle = 'bg-gray-300';
       break;
-    case 'SHIP':
-      cellStyle = 'bg-gray-700';
+    case CellStatus.SHIP:
+      cellStyle = 'bg-blue-700';
       break;
-    case 'HIT':
+    case CellStatus.HIT:
       cellStyle = 'bg-red-500';
       break;
-    case 'MISS':
-      cellStyle = 'bg-blue-500';
+    case CellStatus.MISS:
+      cellStyle = 'bg-gray-100';
       break;
   }
 
-  // If hovered, apply a stronger border, shadow effect, and transition for a smoother effect.
   let hoverStyle = isHovered
     ? 'bg-opacity-40 border-green-500 border-2 shadow-md transform scale-105 transition-transform duration-150'
     : 'border border-gray-400 transition-transform duration-150';

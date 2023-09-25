@@ -1,4 +1,4 @@
-import { Board, Ship, CellStatus } from '../types';
+import { Board, Ship, CellStatus, ShipName } from '../types';
 
 function canPlaceShip(board: Board, x: number, y: number, ship: Ship): boolean {
   if (ship.direction === 'HORIZONTAL') {
@@ -48,10 +48,10 @@ export function initializeBoard(): Board {
   return board;
 }
 
-export const shipsData = {
-  Destroyer: { size: 1 },
-  Submarine: { size: 2 },
-  Cruiser: { size: 3 },
-  Battleship: { size: 4 },
-  Carrier: { size: 5 },
+export const shipsData: { [key in ShipName]: { size: number } } = {
+  [ShipName.Destroyer]: { size: 1 },
+  [ShipName.Submarine]: { size: 2 },
+  [ShipName.Cruiser]: { size: 3 },
+  [ShipName.Battleship]: { size: 4 },
+  [ShipName.Carrier]: { size: 5 },
 };

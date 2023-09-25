@@ -7,17 +7,26 @@ import {
   placeShip as placeShipHelper,
   shipsData,
 } from '../../helpers';
-import { Board as BoardType, Ship as ShipType } from '../../types';
+import {
+  Board as BoardType,
+  Ship as ShipType,
+  Player,
+  GameStatus,
+  CellStatus,
+} from '../../types';
 import { placeShip } from '../../features/selectShipReudcer';
-import { setPlayerBoard, Player, GameStatus } from '../../features/gameReducer';
+import { setPlayerBoard, playerShoot } from '../../features/gameReducer';
 
 type BoardProps = {
-  player1Board: BoardType;
-  player2Board: BoardType;
+  player1Board?: BoardType;
+  player2Board?: BoardType;
   activePlayer: Player;
   gameStatus: GameStatus;
-  selectedShipName: string | null;
-  player1AllShipsPlaced: boolean;
+  selectedShipName?: string | null;
+  player1AllShipsPlaced?: boolean;
+  isShootingBoard?: boolean;
+  setIsShooted?: React.Dispatch<React.SetStateAction<boolean>>;
+  isShooted?: boolean;
 };
 
 const Board: React.FC<BoardProps> = ({
@@ -27,6 +36,9 @@ const Board: React.FC<BoardProps> = ({
   activePlayer,
   selectedShipName,
   player1AllShipsPlaced,
+  isShootingBoard,
+  setIsShooted,
+  isShooted,
 }) => {
   const dispatch = useDispatch();
   const [hoveredCells, setHoveredCells] = useState<Set<string>>(new Set());
@@ -56,14 +68,11 @@ const Board: React.FC<BoardProps> = ({
       setBoard(initializeBoard());
       setIsPlayer2BoardInitialized(true);
     }
-    if (gameStatus !== GameStatus.SettingUp) {
-      setBoard(activePlayer === Player.Player1 ? player1Board : player2Board);
-    }
   }, [activePlayer, player1Board, player2Board]);
 
   useEffect(() => {
     if (selectedShipName) {
-      const size = shipsData[selectedShipName].size;
+      const size = shipsData[selectedShipName as keyof typeof shipsData].size;
       setCurrentShip({
         x: 0,
         y: 0,
@@ -75,14 +84,28 @@ const Board: React.FC<BoardProps> = ({
     }
   }, [selectedShipName]);
 
+  useEffect(() => {
+    if (gameStatus === GameStatus.InPlay) {
+      if (isShootingBoard) {
+        setBoard(
+          activePlayer === Player.Player1 ? player2Board! : player1Board!,
+        );
+      } else {
+        setBoard(
+          activePlayer === Player.Player1 ? player1Board! : player2Board!,
+        );
+      }
+    }
+  }, [gameStatus, activePlayer, isShootingBoard, player1Board, player2Board]);
+
   const handleRightClick = (e: React.MouseEvent, x: number, y: number) => {
     e.preventDefault();
 
     if (currentShip) {
       setCurrentShip((prevShip) => ({
-        ...prevShip,
+        ...prevShip!,
         direction:
-          prevShip.direction === 'HORIZONTAL' ? 'VERTICAL' : 'HORIZONTAL',
+          prevShip!.direction === 'HORIZONTAL' ? 'VERTICAL' : 'HORIZONTAL',
       }));
     }
 
@@ -90,11 +113,11 @@ const Board: React.FC<BoardProps> = ({
   };
 
   const handleMouseOver = (x: number, y: number) => {
-    if (!currentShip) return; // Early exit if currentShip is null
+    if (GameStatus.SettingUp && !currentShip) return; // Early exit if currentShip is null
     const shipCells = computePotentialShipCells(x, y);
     const isInvalidPlacement =
       shipCells.some((cell) => board[cell.x][cell.y] === 'SHIP') ||
-      shipCells.length !== currentShip.length;
+      shipCells.length !== currentShip!.length;
 
     if (!isInvalidPlacement) {
       setHoveredCells(new Set(shipCells.map((cell) => `${cell.x},${cell.y}`)));
@@ -149,41 +172,76 @@ const Board: React.FC<BoardProps> = ({
   const handlePlaceShip = () => {
     dispatch(placeShip(selectedShipName!));
   };
+  const handleShoot = (x: number, y: number) => {
+    if (isShooted) {
+      return false;
+    }
+    dispatch(playerShoot({ x, y }));
+    setIsShooted?.(true);
+    return true;
+  };
+
+  const handlePlace = (x: number, y: number) => {
+    if (!currentShip || !selectedShipName) return;
+
+    const newBoard = placeShipHelper(board, x, y, currentShip);
+    if (newBoard === board) return;
+
+    setBoard(newBoard);
+    handlePlaceShip(); // Update the ship's `isPlaced` status in the Redux store
+    dispatch(setPlayerBoard(newBoard));
+  };
 
   const handleCellClick = (x: number, y: number) => {
-    if (currentShip && selectedShipName) {
-      const newBoard = placeShipHelper(board, x, y, currentShip);
-      if (newBoard !== board) {
-        console.log('Board Updated');
-        setBoard(newBoard);
-        handlePlaceShip(); // Update the ship's `isPlaced` status in the Redux store
-        dispatch(setPlayerBoard(newBoard));
-      }
+    if (isShootingBoard) {
+      handleShoot(x, y);
+    } else {
+      handlePlace(x, y);
     }
   };
 
+  const renderCellContent = (row: CellStatus[], rowIndex: number) => {
+    return row.map((cell, cellIndex) => {
+      let displayStatus = cell;
+
+      if (isShootingBoard) {
+        if (
+          activePlayer === Player.Player1 &&
+          displayStatus === CellStatus.SHIP
+        ) {
+          // Player 1 is shooting, hide the ship cells of Player 2
+          displayStatus = CellStatus.EMPTY;
+        } else if (
+          activePlayer === Player.Player2 &&
+          displayStatus === CellStatus.SHIP
+        ) {
+          // Player 2 is shooting, hide the ship cells of Player 1
+          displayStatus = CellStatus.EMPTY;
+        }
+      }
+
+      return (
+        <Cell
+          key={cellIndex}
+          status={displayStatus}
+          isHovered={hoveredCells.has(`${rowIndex},${cellIndex}`)}
+          onClick={() => handleCellClick(rowIndex, cellIndex)}
+          onContextMenu={(e) => handleRightClick(e, rowIndex, cellIndex)}
+          onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
+          isInvalidHover={invalidHoveredCells.has(`${rowIndex},${cellIndex}`)}
+          onMouseOut={handleMouseOut}
+        />
+      );
+    });
+  };
+
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="bg-gray-100  rounded shadow-lg">
-        {board.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex">
-            {row.map((cell, cellIndex) => (
-              <Cell
-                key={cellIndex}
-                status={cell}
-                isHovered={hoveredCells.has(`${rowIndex},${cellIndex}`)}
-                onClick={() => handleCellClick(rowIndex, cellIndex)}
-                onContextMenu={(e) => handleRightClick(e, rowIndex, cellIndex)} // pass the coordinates into the right-click handler
-                onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
-                isInvalidHover={invalidHoveredCells.has(
-                  `${rowIndex},${cellIndex}`,
-                )}
-                onMouseOut={handleMouseOut}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+    <div className="bg-gray-100  rounded shadow-lg">
+      {board.map((row, rowIndex) => (
+        <div key={rowIndex} className="flex">
+          {renderCellContent(row, rowIndex)}
+        </div>
+      ))}
     </div>
   );
 };
