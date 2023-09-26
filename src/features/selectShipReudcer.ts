@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { ShipName } from '../types';
 
 export type Ship = {
@@ -42,9 +43,13 @@ const selectShipSlice = createSlice({
         ship.isPlaced = false;
       });
     },
+    resetSelectShipState: (state) => {
+      return selectShipInitialState;
+    },
   },
 });
 
-export const { selectShip, placeShip, resetShips } = selectShipSlice.actions;
+export const { selectShip, placeShip, resetShips, resetSelectShipState } =
+  selectShipSlice.actions;
 
 export default selectShipSlice.reducer;

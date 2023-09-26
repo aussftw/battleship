@@ -4,7 +4,7 @@ const Footer: React.FC = () => {
       <div className="footer-text text-center py-4">
         <p className="text-lg">
           Developed and Made with
-          <span className="text-red-800 ml-1">&#x2665;</span>
+          <span className="text-red-500 ml-1">&#x2665;</span>
           <br />
           by Alexander Kaminskiy &copy; 2023
         </p>

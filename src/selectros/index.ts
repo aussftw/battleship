@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 
 import { RootState } from '../store/store';
 import { Board, CellStatus, GameStatus, Player, ShipName } from '../types';
+import { Winner } from '../features/gameReducer';
 
 const isShipPlaced = (cell: CellStatus) => cell === CellStatus.SHIP;
 
@@ -17,7 +18,6 @@ export const allShipsPlacedSelector = (player: 'player1' | 'player2') =>
           }
         }
       }
-
       // Compare shipsPlaced with the total number of ship cells required to be placed
       const totalShipCellsRequired = 15;
       return shipsPlaced === totalShipCellsRequired;
@@ -65,4 +65,9 @@ export const selectedShipNameSelector = createSelector(
 export const gameStatusSelector = createSelector(
   [gameStateSelector],
   (game): GameStatus => game.gameStatus,
+);
+
+export const winnerSelector = createSelector(
+  [gameStateSelector],
+  (game): Winner => game.winner,
 );

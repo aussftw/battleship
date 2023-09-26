@@ -200,6 +200,65 @@ const Board: React.FC<BoardProps> = ({
     }
   };
 
+  // const renderCellContent = (row: CellStatus[], rowIndex: number) => {
+  //   return row.map((cell, cellIndex) => {
+  //     let displayStatus = cell;
+
+  //     if (isShootingBoard) {
+  //       if (
+  //         activePlayer === Player.Player1 &&
+  //         displayStatus === CellStatus.SHIP
+  //       ) {
+  //         // Player 1 is shooting, hide the ship cells of Player 2
+  //         displayStatus = CellStatus.EMPTY;
+  //       } else if (
+  //         activePlayer === Player.Player2 &&
+  //         displayStatus === CellStatus.SHIP
+  //       ) {
+  //         // Player 2 is shooting, hide the ship cells of Player 1
+  //         displayStatus = CellStatus.EMPTY;
+  //       }
+  //     }
+
+  //     return (
+  //       <Cell
+  //         key={cellIndex}
+  //         status={displayStatus}
+  //         isHovered={hoveredCells.has(`${rowIndex},${cellIndex}`)}
+  //         onClick={() => handleCellClick(rowIndex, cellIndex)}
+  //         onContextMenu={(e) => handleRightClick(e, rowIndex, cellIndex)}
+  //         onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
+  //         isInvalidHover={invalidHoveredCells.has(`${rowIndex},${cellIndex}`)}
+  //         onMouseOut={handleMouseOut}
+  //       />
+  //     );
+  //   });
+  // };
+
+  const renderBoard = (board: CellStatus[][]) => {
+    return (
+      <div>
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '20px' }} />{' '}
+          {/* Empty space for the top-left corner */}
+          {board[0].map((_, index) => (
+            <div key={index} style={{ width: '33px', textAlign: 'center' }}>
+              {index + 1} {/* Column numbers */}
+            </div>
+          ))}
+        </div>
+        {board.map((row, rowIndex) => (
+          <div key={rowIndex} style={{ display: 'flex' }}>
+            <div style={{ width: '33px', textAlign: 'center' }}>
+              {String.fromCharCode(65 + rowIndex)} {/* Row letters */}
+            </div>
+            {renderCellContent(row, rowIndex)}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderCellContent = (row: CellStatus[], rowIndex: number) => {
     return row.map((cell, cellIndex) => {
       let displayStatus = cell;
@@ -219,7 +278,6 @@ const Board: React.FC<BoardProps> = ({
           displayStatus = CellStatus.EMPTY;
         }
       }
-
       return (
         <Cell
           key={cellIndex}
@@ -236,13 +294,7 @@ const Board: React.FC<BoardProps> = ({
   };
 
   return (
-    <div className="bg-gray-100  rounded shadow-lg">
-      {board.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex">
-          {renderCellContent(row, rowIndex)}
-        </div>
-      ))}
-    </div>
+    <div className="bg-gray-100  rounded shadow-lg">{renderBoard(board)}</div>
   );
 };
 

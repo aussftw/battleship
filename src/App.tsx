@@ -1,4 +1,4 @@
-import { Footer, Contacts } from './components';
+import { Footer, Contacts, Header } from './components';
 import { useState, useMemo, useCallback } from 'react';
 import { Game, Welcome } from './pages';
 
@@ -16,9 +16,14 @@ function App() {
 
   return (
     <>
-      {renderComponent}
-      <Contacts />
-      <Footer />
+      <Header />
+      <div className="flex flex-col min-h-screen">
+        <div className="flex-1">
+          {renderComponent}
+          {/* <Contacts /> */}
+        </div>
+        <Footer />
+      </div>
     </>
   );
 }

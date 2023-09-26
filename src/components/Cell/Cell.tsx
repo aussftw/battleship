@@ -29,7 +29,7 @@ const Cell: React.FC<CellProps> = ({
       cellStyle = 'bg-gray-300';
       break;
     case CellStatus.SHIP:
-      cellStyle = 'bg-blue-700';
+      cellStyle = 'bg-blue-300';
       break;
     case CellStatus.HIT:
       cellStyle = 'bg-red-500';

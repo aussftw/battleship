@@ -1,13 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Board, CellStatus } from '../types';
 
-import { GameStatus, Player } from '../types';
+import { Board, CellStatus, GameStatus, Player } from '../types';
+import { allShipsSunk } from '../helpers';
+
+export type Winner = Player | null;
 
 type GameState = {
   activePlayer: Player;
   gameStatus: GameStatus;
   player1Board: Board;
   player2Board: Board;
+  winner: Player | null;
 };
 
 const initialState: GameState = {
@@ -15,6 +18,7 @@ const initialState: GameState = {
   gameStatus: GameStatus.SettingUp,
   player1Board: [],
   player2Board: [],
+  winner: null,
 };
 
 const gameSlice = createSlice({
@@ -47,8 +51,17 @@ const gameSlice = createSlice({
       } else if (targetBoard[x][y] === CellStatus.EMPTY) {
         targetBoard[x][y] = CellStatus.MISS;
       }
+
+      if (allShipsSunk(targetBoard)) {
+        state.winner = state.activePlayer;
+        state.gameStatus = GameStatus.Ended;
+      }
     },
-    resetGame: (state) => {
+
+    setWinner: (state, action: PayloadAction<Winner>) => {
+      state.winner = action.payload;
+    },
+    resetGameState: (state) => {
       return initialState;
     },
   },
@@ -59,6 +72,7 @@ export const {
   setGameStatus,
   setPlayerBoard,
   playerShoot,
-  resetGame,
+  resetGameState,
+  setWinner,
 } = gameSlice.actions;
 export default gameSlice.reducer;
