@@ -18,10 +18,8 @@ function App() {
     <>
       <Header />
       <div className="flex flex-col min-h-screen">
-        <div className="flex-1">
-          {renderComponent}
-          {/* <Contacts /> */}
-        </div>
+        <div className="flex-1">{renderComponent}</div>
+        <Contacts />
         <Footer />
       </div>
     </>

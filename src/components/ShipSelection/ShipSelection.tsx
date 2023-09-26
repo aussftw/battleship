@@ -9,11 +9,11 @@ export interface Ship {
   isPlaced: boolean;
 }
 
-interface ShipSelectionProps {
+type ShipSelectionProps = {
   ships: Ship[];
   selectedShipName: ShipName | null;
   onSelectShip: (ship: Ship) => void;
-}
+};
 
 const ShipSelection: React.FC<ShipSelectionProps> = ({
   ships,
@@ -53,7 +53,7 @@ const ShipSelection: React.FC<ShipSelectionProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-1 max-w-xs mx-auto mt-12">
+    <div className="flex flex-col items-center space-y-1 max-w-xs mx-auto mt-24 h-32">
       {ships.map((ship) => renderShip(ship))}
     </div>
   );

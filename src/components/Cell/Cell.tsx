@@ -1,7 +1,7 @@
 import React from 'react';
 import { CellStatus } from '../../types';
 
-interface CellProps {
+type CellProps = {
   status: CellStatus;
   onClick?: () => void;
   className?: string;
@@ -10,7 +10,7 @@ interface CellProps {
   onMouseOut?: () => void;
   isHovered?: boolean;
   isInvalidHover?: boolean;
-}
+};
 
 const Cell: React.FC<CellProps> = ({
   status,
