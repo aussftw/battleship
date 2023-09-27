@@ -1,7 +1,7 @@
 import React from 'react';
 import { CellStatus } from '../../types';
 
-type CellProps = {
+export type CellProps = {
   status: CellStatus;
   onClick?: () => void;
   className?: string;

@@ -48,7 +48,7 @@ export const Game: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [isShooted, setIsShooted] = useState<boolean>(false);
 
-  console.log(activePlayer, gameStatus, player1AllShipsPlaced);
+  // handleSelectShip dispatches the selectShip action with the selected ship's name.
 
   const handleSelectShip = useCallback(
     (ship: Ship) => {
@@ -57,19 +57,27 @@ export const Game: React.FC = () => {
     [dispatch],
   );
 
+  // handleResetClick closes the modal and dispatches the resetShips action to reset the ships.
+
   const handleResetClick = useCallback((): void => {
     setIsOpenModal(false);
     dispatch(resetShips());
   }, []);
 
+  // handleModalClose simply closes the modal.
+
   const handleModalClose = useCallback((): void => {
     setIsOpenModal(false);
   }, []);
+
+  // handleResetGame dispatches actions to reset the game state and the select ship state.
 
   const handleResetGame = useCallback((): void => {
     dispatch(resetSelectShipState());
     dispatch(resetGameState());
   }, []);
+
+  // handlePassTurn switches the active player and opens the modal.
 
   const handlePassTurn = useCallback((): void => {
     setIsOpenModal(true);
@@ -81,6 +89,8 @@ export const Game: React.FC = () => {
     );
   }, [dispatch, activePlayer]);
 
+  // This effect sets the active player and opens the modal when all ships of player 1 are placed.
+
   useEffect(() => {
     if (player1AllShipsPlaced) {
       dispatch(setActivePlayer(Player.Player2));
@@ -91,12 +101,16 @@ export const Game: React.FC = () => {
     }
   }, [player1AllShipsPlaced, player2AllShipsPlaced]);
 
+  // This effect sets the game status to InPlay and sets the active player when the game is in the SettingUp status and all ships of player 2 are placed
+
   useEffect(() => {
     if (player2AllShipsPlaced && gameStatus === GameStatus.SettingUp) {
       dispatch(setGameStatus(GameStatus.InPlay));
       dispatch(setActivePlayer(Player.Player1));
     }
   }, [gameStatus, player2AllShipsPlaced]);
+
+  // This effect opens the modal and resets isShooted when there is a winner.
 
   useEffect(() => {
     if (winner) {
@@ -105,7 +119,7 @@ export const Game: React.FC = () => {
     }
   }, [winner, isShooted]);
 
-  console.log(isShooted);
+  // renderInPlay renders the boards and the finish turn button when the game status is InPlay.
 
   const renderInPlay = () => {
     if (gameStatus !== GameStatus.InPlay) return null;
@@ -149,6 +163,8 @@ export const Game: React.FC = () => {
     );
   };
 
+  // renderShipSelection renders the ShipSelection and Board components when the game status is SettingUp.
+
   const renderShipSelection = () => {
     if (gameStatus === GameStatus.SettingUp) {
       return (
@@ -174,6 +190,8 @@ export const Game: React.FC = () => {
     }
   };
 
+  // renderModal renders the GameModal component when isOpenModal is true.
+
   const renderModal = () => {
     if (isOpenModal) {
       return (
@@ -188,6 +206,8 @@ export const Game: React.FC = () => {
       );
     }
   };
+
+  // The component returns the rendered ShipSelection, Modal, and InPlay components based on the game status.
 
   return (
     <>

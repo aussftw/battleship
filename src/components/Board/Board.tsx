@@ -57,6 +57,7 @@ const Board: React.FC<BoardProps> = ({
     direction: 'HORIZONTAL',
   });
 
+  // Automaticaly init player 2 board after condition is met
   useEffect(() => {
     if (
       player1AllShipsPlaced &&
@@ -69,6 +70,8 @@ const Board: React.FC<BoardProps> = ({
       setIsPlayer2BoardInitialized(true);
     }
   }, [activePlayer, player1Board, player2Board]);
+
+  // This effect sets the current ship when a ship is selected.
 
   useEffect(() => {
     if (selectedShipName) {
@@ -83,6 +86,8 @@ const Board: React.FC<BoardProps> = ({
       setCurrentShip(null);
     }
   }, [selectedShipName]);
+
+  // This effect sets the board based on the game status, active player, and whether it's a shooting board.
 
   useEffect(() => {
     if (gameStatus === GameStatus.InPlay) {
@@ -112,6 +117,8 @@ const Board: React.FC<BoardProps> = ({
     handleMouseOver(x, y);
   };
 
+  // handleMouseOver computes and sets the potential ship cells when the mouse is over a cell.
+
   const handleMouseOver = (x: number, y: number) => {
     if (GameStatus.SettingUp && !currentShip) return; // Early exit if currentShip is null
     const shipCells = computePotentialShipCells(x, y);
@@ -130,9 +137,13 @@ const Board: React.FC<BoardProps> = ({
     }
   };
 
+  // handleMouseOut clears the hovered cells when the mouse is out of a cell.
+
   const handleMouseOut = () => {
     setHoveredCells(new Set());
   };
+
+  // computePotentialShipCells computes the potential ship cells based on the current ship's length and direction.
 
   const computePotentialShipCells = (
     x: number,
@@ -169,6 +180,8 @@ const Board: React.FC<BoardProps> = ({
     return shipCells;
   };
 
+  // handlePlaceShip dispatches the placeShip action to update the ship's `isPlaced` status in the Redux store.
+
   const handlePlaceShip = () => {
     dispatch(placeShip(selectedShipName!));
   };
@@ -192,6 +205,8 @@ const Board: React.FC<BoardProps> = ({
     dispatch(setPlayerBoard(newBoard));
   };
 
+  // handleCellClick handles cell clicks, either placing a ship or shooting, based on whether it's a shooting board.
+
   const handleCellClick = (x: number, y: number) => {
     if (isShootingBoard) {
       handleShoot(x, y);
@@ -200,40 +215,7 @@ const Board: React.FC<BoardProps> = ({
     }
   };
 
-  // const renderCellContent = (row: CellStatus[], rowIndex: number) => {
-  //   return row.map((cell, cellIndex) => {
-  //     let displayStatus = cell;
-
-  //     if (isShootingBoard) {
-  //       if (
-  //         activePlayer === Player.Player1 &&
-  //         displayStatus === CellStatus.SHIP
-  //       ) {
-  //         // Player 1 is shooting, hide the ship cells of Player 2
-  //         displayStatus = CellStatus.EMPTY;
-  //       } else if (
-  //         activePlayer === Player.Player2 &&
-  //         displayStatus === CellStatus.SHIP
-  //       ) {
-  //         // Player 2 is shooting, hide the ship cells of Player 1
-  //         displayStatus = CellStatus.EMPTY;
-  //       }
-  //     }
-
-  //     return (
-  //       <Cell
-  //         key={cellIndex}
-  //         status={displayStatus}
-  //         isHovered={hoveredCells.has(`${rowIndex},${cellIndex}`)}
-  //         onClick={() => handleCellClick(rowIndex, cellIndex)}
-  //         onContextMenu={(e) => handleRightClick(e, rowIndex, cellIndex)}
-  //         onMouseOver={() => handleMouseOver(rowIndex, cellIndex)}
-  //         isInvalidHover={invalidHoveredCells.has(`${rowIndex},${cellIndex}`)}
-  //         onMouseOut={handleMouseOut}
-  //       />
-  //     );
-  //   });
-  // };
+  // renderBoard renders the game board with row letters and column numbers.
 
   const renderBoard = (board: CellStatus[][]) => {
     return (
@@ -258,6 +240,8 @@ const Board: React.FC<BoardProps> = ({
       </div>
     );
   };
+
+  // renderCellContent renders the content of each cell based on the game status and active player.
 
   const renderCellContent = (row: CellStatus[], rowIndex: number) => {
     return row.map((cell, cellIndex) => {

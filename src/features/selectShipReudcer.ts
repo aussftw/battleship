@@ -43,7 +43,7 @@ const selectShipSlice = createSlice({
         ship.isPlaced = false;
       });
     },
-    resetSelectShipState: (state) => {
+    resetSelectShipState: () => {
       return selectShipInitialState;
     },
   },
