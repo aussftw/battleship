@@ -1,8 +1,3 @@
-Certainly! Below is a template for a README.md file based on the provided package.json and the game components. You can modify it to suit your project's specific needs and details.
-
-markdown
-Copy code
-
 # Battleship Test Game
 
 This project is a React-based implementation of the classic Battleship game. It utilizes Redux for state management and offers a modern, user-friendly interface for gameplay.
